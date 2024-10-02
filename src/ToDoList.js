@@ -25,11 +25,13 @@ const ToDoList = () => {
   const handleAddTodo = (e) => {
     e.preventDefault();
     if (newTodoTitle.trim() === "") return;
+
     const newTodo = {
       id: Date.now(),
       title: newTodoTitle,
       completed: false,
     };
+
     setTodos([...todos, newTodo]);
     setNewTodoTitle("");
   };
@@ -45,9 +47,27 @@ const ToDoList = () => {
     [todos]
   );
 
+  const handleDeleteTodo = (id, e) => {
+    e.stopPropagation();
+    const updateTodos = todos.filter((todo) => todo.id !== id);
+    setTodos(updateTodos);
+    localStorage.setItem("todos", JSON.stringify(updateTodos));
+  };
+
   useEffect(() => {
-    getToDos();
+    const storedTodos = JSON.parse(localStorage.getItem("todos"));
+    if (storedTodos) {
+      setTodos(storedTodos);
+    } else {
+      getToDos();
+    }
   }, []);
+
+  useEffect(() => {
+    if (todos.length > 0) {
+      localStorage.setItem("todos", JSON.stringify(todos));
+    }
+  }, [todos]);
 
   return (
     <Wrapper>
@@ -63,7 +83,7 @@ const ToDoList = () => {
       </Form>
       <TodoList>
         {todos.map((todo) => (
-          <TodoItem key={todo.id}>
+          <TodoItem key={todo.id} completed={todo.completed}>
             <div>
               <Checkbox
                 type="checkbox"
@@ -72,6 +92,9 @@ const ToDoList = () => {
               />
               <TodoText completed={todo.completed}>{todo.title}</TodoText>
             </div>
+            <DeleteButton onClick={(e) => handleDeleteTodo(todo.id, e)}>
+              Delete
+            </DeleteButton>
           </TodoItem>
         ))}
       </TodoList>
@@ -119,8 +142,13 @@ const AddButton = styled.button`
   border-radius: 0 4px 4px 0;
   cursor: pointer;
   font-size: 15px;
+  line-height: 1;
   &:hover {
     background-color: #2563eb;
+  }
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
   }
 `;
 
@@ -137,13 +165,25 @@ const TodoItem = styled.li`
   border-bottom: 1px solid #e5e7eb;
 `;
 
-const TodoText = styled.span`
-  margin-left: 0.5rem;
-  text-decoration: ${(props) => (props.completed ? "line-through" : "none")};
-  color: ${(props) => (props.completed ? "#9ca3af" : "inherit")};
+const DeleteButton = styled.button`
+  background: transparent;
+  color: red;
+  border: none;
+  border-radius: 3px;
+  font-size: 16px;
+  cursor: pointer;
+  &:hover {
+    color: #ff8293;
+  }
 `;
 
 const Checkbox = styled.input`
   margin-right: 0.5rem;
   cursor: pointer;
+`;
+
+const TodoText = styled.span`
+  margin-left: 0.5rem;
+  text-decoration: ${(props) => (props.completed ? "line-through" : "none")};
+  color: ${(props) => (props.completed ? "#9ca3af" : "inherit")};
 `;
