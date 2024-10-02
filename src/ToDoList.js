@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 
 const ToDoList = () => {
@@ -34,6 +34,17 @@ const ToDoList = () => {
     setNewTodoTitle("");
   };
 
+  const handleToggleComplete = useCallback(
+    (id) => {
+      setTodos(
+        todos.map((todo) =>
+          todo.id === id ? { ...todo, completed: !todo.completed } : todo
+        )
+      );
+    },
+    [todos]
+  );
+
   useEffect(() => {
     getToDos();
   }, []);
@@ -54,7 +65,12 @@ const ToDoList = () => {
         {todos.map((todo) => (
           <TodoItem key={todo.id}>
             <div>
-              <TodoText>{todo.title}</TodoText>
+              <Checkbox
+                type="checkbox"
+                checked={todo.completed}
+                onChange={() => handleToggleComplete(todo.id)}
+              />
+              <TodoText completed={todo.completed}>{todo.title}</TodoText>
             </div>
           </TodoItem>
         ))}
@@ -123,4 +139,11 @@ const TodoItem = styled.li`
 
 const TodoText = styled.span`
   margin-left: 0.5rem;
+  text-decoration: ${(props) => (props.completed ? "line-through" : "none")};
+  color: ${(props) => (props.completed ? "#9ca3af" : "inherit")};
+`;
+
+const Checkbox = styled.input`
+  margin-right: 0.5rem;
+  cursor: pointer;
 `;
