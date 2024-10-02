@@ -3,6 +3,7 @@ import styled from "styled-components";
 
 const ToDoList = () => {
   const [todos, setTodos] = useState([]);
+  const [newTodoTitle, setNewTodoTitle] = useState("");
 
   const getToDos = async () => {
     try {
@@ -21,6 +22,18 @@ const ToDoList = () => {
     }
   };
 
+  const handleAddTodo = (e) => {
+    e.preventDefault();
+    if (newTodoTitle.trim() === "") return;
+    const newTodo = {
+      id: Date.now(),
+      title: newTodoTitle,
+      completed: false,
+    };
+    setTodos([...todos, newTodo]);
+    setNewTodoTitle("");
+  };
+
   useEffect(() => {
     getToDos();
   }, []);
@@ -28,6 +41,15 @@ const ToDoList = () => {
   return (
     <Wrapper>
       <Header>ToDoList</Header>
+      <Form onSubmit={handleAddTodo}>
+        <Input
+          type="text"
+          placeholder="Add New To-Do"
+          value={newTodoTitle}
+          onChange={(e) => setNewTodoTitle(e.target.value)}
+        />
+        <AddButton type="submit">Add</AddButton>
+      </Form>
       <TodoList>
         {todos.map((todo) => (
           <TodoItem key={todo.id}>
@@ -54,6 +76,36 @@ const Wrapper = styled.div`
 
 const Header = styled.h1`
   text-align: center;
+`;
+
+const Form = styled.form`
+  display: flex;
+  margin-bottom: 20px;
+`;
+
+const Input = styled.input`
+  flex-grow: 1;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px 0 0 4px;
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  }
+`;
+
+const AddButton = styled.button`
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+  font-size: 15px;
+  &:hover {
+    background-color: #2563eb;
+  }
 `;
 
 const TodoList = styled.ul`
