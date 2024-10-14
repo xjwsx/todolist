@@ -5,6 +5,7 @@ const GlobalStyle = createGlobalStyle`
   body {
     background: linear-gradient(to bottom right, #ff0000, #800080);
     height: 100vh;
+    width: 100vw;
   }
 `;
 
